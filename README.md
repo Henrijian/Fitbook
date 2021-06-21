@@ -4,6 +4,10 @@
 
 Fitbook is a web application which tracks the workout information and in helps of improving effectiveness of exercise.
 
+## Demo video
+
+https://youtu.be/hUUEp3LmFWA
+
 ## How to use
 
 This section explains how to setup and use Fitbook step by step.  
@@ -25,7 +29,7 @@ In order to track workout information, Fitbook needs to know who are you, so you
 1. Going to "Register" page by clicking the top-right "Register" menu item.
 2. Fill the "username" input which will be used for login in the future, the username must be alphanumeric and the length of it must be between 5 and 15.
 3. Fill the "password" input which belongs to the username for future authentication, this password must be alphanumeric and length of it must be between 5 and 15.
-4. Fill the "confirmation" input which must be as same as password for double check. 
+4. Fill the "confirmation" input which must be as same as password for double check.
 5. Click "submit" to create your account.
 
 ![Register](README/register.png)
