@@ -1,0 +1,284 @@
+{% extends "layout.html" %}
+
+{% block header %}
+<link href="/static/css/record.css" rel="stylesheet">
+{% endblock %}
+
+{% block title %}
+    Record
+{% endblock %}
+
+{% block main %}
+<div class="row row-cols-md-2 justify-content-center">
+    <div class="col-md-7 px-3 pr-md-3">
+        <div class="row my-3">
+            <div class="col-6 d-flex justify-content-start align-items-center">
+                <h5 id="record_calendar_header" class="m-0"></h5>
+            </div>
+            <div class="col-6 d-flex justify-content-end">
+                <button id="btn_record_calendar_prev" class="btn btn-primary btn-sm" type="button">
+                    <i class="fas fa-caret-left"></i>
+                </button>
+                <button id="btn_record_calendar_today" class="btn btn-primary btn-sm mx-1" type="button">
+                    today
+                </button>
+                <button id="btn_record_calendar_next" class="btn btn-primary btn-sm" type="button">
+                    <i class="fas fa-caret-right"></i>
+                </button>
+            </div>
+        </div>
+        <div id="record_calendar" class="mb-3"></div>
+    </div>
+    <div class="col-md-4 bg-primary text-white p-0">
+        <div id="card_record_exercise" class="card bg-primary">
+            <div class="card-body">
+                <h5 class="card-title">Date</h5>
+                <input id="record_date" type="text" readonly="" class="form-control datepicker" name="date" placeholder="yyyy-mm-dd" value="{{ record_date_str }}" style="border-radius: 0px;">
+
+
+                <hr class="my-3 sep">
+
+                <h5 class="card-title">Exercises</h5>
+                <div id="exercise_records">
+                    {% for exercise_record_template in exercise_record_templates %}
+                        {{ exercise_record_template|safe }}
+                    {% endfor %}
+                </div>
+
+                <hr class="my-1 sep">
+
+                <button id="btn_append_exercise_records" type="button" class="btn btn-outline-secondary btn-sm btn-block" data-toggle="modal" data-target="#modal_add_exercise">Add Exercise</button>
+                <div id="modal_add_exercise" class="modal fade">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header bg-primary">
+                                <h5 class="modal-title text-white">Add Exercise</h5>
+                                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <label class="text-primary">TYPE</label>
+                                <nav class="mb-3">
+                                    <div class="nav nav-pills nav-fill">
+                                        <a id="strength_exercise_tab" class="nav-item nav-link active" data-toggle="tab" href="#strength_exercise_tab_pane">Strength</a>
+                                        <a id="cardio_exercise_tab" class="nav-item nav-link" data-toggle="tab" href="#cardio_exercise_tab_pane">Cardio</a>
+                                    </div>
+                                </nav>
+                                <div class="tab-content">
+                                    <div class="tab-pane fade active show" id="strength_exercise_tab_pane">
+                                        <div class="form-group">
+                                            <label for="strength_muscle_group_select" class="text-primary">MUSCLE GROUP</label>
+                                            <select id="strength_muscle_group_select" class="custom-select custom-select-sm muscle_group_select" muscle-group-exercises="strength_exercise_select">
+                                                {% for strength_muscle_group in strength_muscle_groups %}
+                                                    {% if loop.index0 == 0 %}
+                                                    <option value="{{ strength_muscle_group }}" selected>{{ strength_muscle_group }}</option>
+                                                    {% else %}
+                                                    <option value="{{ strength_muscle_group }}">{{ strength_muscle_group }}</option>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="strength_exercise_select" class="text-primary">EXERCISE</label>
+                                            <select id="strength_exercise_select" class="custom-select custom-select-sm">
+                                                {% for strength_exercise_id_name in strength_exercise_ids_names %}
+                                                    {% if loop.index0 == 0 %}
+                                                    <option value="{{ strength_exercise_id_name[0] }}" selected>{{ strength_exercise_id_name[1] }}</option>
+                                                    {% else %}
+                                                    <option value="{{ strength_exercise_id_name[0] }}">{{ strength_exercise_id_name[1] }}</option>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="text-primary">SETS</label>
+                                            <div id="exercise_sets">
+                                            </div>
+                                            <button id="btn_append_exercise_sets" type="button" class="btn btn-outline-secondary btn-sm btn-block p-1 my-1">
+                                                Add Set
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="tab-pane fade" id="cardio_exercise_tab_pane">
+                                        <div class="form-group">
+                                            <label for="cardio_exercise_select" class="text-primary">EXERCISE</label>
+                                            <select id="cardio_exercise_select" class="custom-select custom-select-sm">
+                                                {% for cardio_exercise_id_name in cardio_exercise_ids_names %}
+                                                    {% if loop.index0 == 0 %}
+                                                    <option value="{{ cardio_exercise_id_name[0] }}" selected>{{ cardio_exercise_id_name[1] }}</option>
+                                                    {% else %}
+                                                    <option value="{{ cardio_exercise_id_name[0] }}">{{ cardio_exercise_id_name[1] }}</option>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="cardio_exercise_time" class="text-primary">TIME</label>
+                                            <div id="cardio_exercise_time" class="input-group input-group-sm">
+                                                <input id="cardio_exercise_hrs" type="number" class="form-control text-right" placeholder="Hours" value="">
+                                                <div class="input-group-append">
+                                                    <span class="input-group-text px-1">HRS</span>
+                                                </div>
+                                                <input id="cardio_exercise_mins" type="number" class="form-control text-right" placeholder="Minutes" value="">
+                                                <div class="input-group-append">
+                                                    <span class="input-group-text px-1">MINS</span>
+                                                </div>
+                                                <input id="cardio_exercise_secs" type="number" class="form-control text-right" placeholder="Seconds" value="">
+                                                <div class="input-group-append">
+                                                    <span class="input-group-text px-1">SECS</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-danger" id="btn_add_exercise">ADD</button>
+                                <button type="button" class="btn btn-info" id="btn_save_exercise">SAVE</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="my-3 sep">
+
+                <h5 class="card-title">1-Rep Max Weight</h5>
+                <ul id="max_weight_records" class="list-group">
+                    {% for max_weight_record_template in max_weight_record_templates %}
+                        {{ max_weight_record_template|safe }}
+                    {% endfor %}
+                </ul>
+                <hr class="my-1 sep">
+                <button id="btn_append_max_weight_records" type="button" class="btn btn-outline-secondary btn-sm btn-block" data-toggle="modal" data-target="#modal_add_max_weight">Add 1-Rep Max Weight</button>
+                <div id="modal_add_max_weight" class="modal fade">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header bg-primary">
+                                <h5 class="modal-title text-white">Add 1-Rep Max Weight</h5>
+                                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    <label for="max_weight_muscle_group_select" class="text-primary">MUSCLE GROUP</label>
+                                    <select id="max_weight_muscle_group_select" class="custom-select custom-select-sm muscle_group_select" muscle-group-exercises="max_weight_exercise_select">
+                                        {% for strength_muscle_group in strength_muscle_groups %}
+                                            {% if loop.index0 == 0 %}
+                                            <option value="{{ strength_muscle_group }}" selected>{{ strength_muscle_group }}</option>
+                                            {% else %}
+                                            <option value="{{ strength_muscle_group }}">{{ strength_muscle_group }}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="max_weight_exercise_select" class="text-primary">EXERCISE</label>
+                                    <select id="max_weight_exercise_select" class="custom-select custom-select-sm" >
+                                        {% for strength_exercise_id_name in strength_exercise_ids_names %}
+                                            {% if loop.index0 == 0 %}
+                                            <option value="{{ strength_exercise_id_name[0] }}" selected>{{ strength_exercise_id_name[1] }}</option>
+                                            {% else %}
+                                            <option value="{{ strength_exercise_id_name[0] }}">{{ strength_exercise_id_name[1] }}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="text-primary">1-REP MAX WEIGHT</label>
+                                    <div class="input-group input-group-sm">
+                                        <input id="max_weight_input" type="number" class="form-control text-right" placeholder="weight" value="0">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">kg</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-danger" id="btn_add_max_weight">ADD</button>
+                                <button type="button" class="btn btn-info" id="btn_save_max_weight">SAVE</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="my-3 sep">
+
+                <h5 class="card-title">Body</h5>
+                <form>
+                    <div class="form-row">
+                        <label for="body_weight_input" class="col-3 col-form-label text-uppercase">Weight</label>
+                        <div class="input-group col">
+                            <input id="body_weight_input" value="{{ body_weight }}" type="number" class="form-control text-right" placeholder="weight" style="height: 100%" readonly>
+                            <div class="input-group-append">
+                                <span class="input-group-text d-flex justify-content-center" style="width: 4em;">
+                                    kg
+                                </span>
+                                <button id="btn_edit_body_weight" type="button" class="btn btn-primary">
+                                    <i class="fas fa-edit" style="width: 1em;"></i>
+                                </button>
+                                <button id="btn_save_body_weight" type="button" class="btn btn-info d-none">
+                                    <i class="fas fa-save" style="width: 1em;"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <label for="muscle_weight_input" class="col-3 col-form-label text-uppercase">Muscle</label>
+                        <div class="input-group col">
+                            <input id="muscle_weight_input" value="{{ muscle_weight }}" type="number" class="form-control text-right" placeholder="weight" style="height: 100%" readonly>
+                            <div class="input-group-append">
+                                <span class="input-group-text d-flex justify-content-center" style="width: 4em;">
+                                    kg
+                                </span>
+                                <button id="btn_edit_muscle_weight" type="button" class="btn btn-primary">
+                                    <i class="fas fa-edit" style="width: 1em;"></i>
+                                </button>
+                                <button id="btn_save_muscle_weight" type="button" class="btn btn-info d-none">
+                                    <i class="fas fa-save" style="width: 1em;"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <label for="fat_rate_input" class="col-3 col-form-label text-uppercase">Fat</label>
+                        <div class="input-group col">
+                            <input id="fat_rate_input" value="{{ fat_rate }}" type="number" class="form-control text-right" placeholder="ratio" style="height: 100%;" readonly>
+                            <div class="input-group-append">
+                                <span class="input-group-text d-flex justify-content-center" style="width: 4em;">
+                                    %
+                                </span>
+                                <button id="btn_edit_fat_rate" type="button" class="btn btn-primary">
+                                    <i class="fas fa-edit" style="width: 1em;"></i>
+                                </button>
+                                <button id="btn_save_fat_rate" type="button" class="btn btn-info d-none">
+                                    <i class="fas fa-save" style="width: 1em;"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block footer %}
+<script src="{{ url_for('static', filename='js/record.js') }}"></script>
+<script>
+    initialize_datepicker("{{ record_date_str }}");
+    initialize_record_calendar("{{ record_date_str }}");
+</script>
+{% endblock %}
